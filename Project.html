@@ -76,7 +76,7 @@ function initWGLContext(name){
 }
 
 function initScene(){
-  var gl = initWGLContext("hellowebgl");
+  var gl = initWGLContext("projectCanvas");
   if(!gl){
     return;
   }
@@ -237,10 +237,13 @@ function makePlaneGeometry(){
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertexIndicies), gl.STATIC_DRAW);
   vertexIndexBuff.itemSize = 1;
   vertexIndexBuff.numItems = tvi;
+  console.log("here");
 }
 
 function initGeometry(){
   makePlaneGeometry();
+    console.log("here");
+
 }
 
 var texture;
@@ -260,6 +263,8 @@ function handleLoadedTexture(textures){
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.bindTexture(gl.TEXTURE_2D, null);
+      console.log("here");
+
 }
 
 function startWebGL(){
@@ -268,9 +273,9 @@ function startWebGL(){
   initGeometry();
   initTexture();
   
-  var canvas = document.getElementById("hellowebgl");
-  
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  var canvas = document.getElementById("projectCanvas");
+
+  gl.clearColor(1.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
   Frames();
 }
@@ -290,6 +295,7 @@ var xRotation;
 var yRotation;
 var zRotation;
 function drawScene(){
+
   gl.viewport(0,0,gl.viewportWidth,gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   
@@ -322,6 +328,8 @@ function animate(){
 }
 
 function Frames(){
+      console.log("here");
+
   requestAnimFrame(Frames);
   drawScene();
 }
@@ -331,7 +339,7 @@ function Frames(){
   
     
 </head>
-<body>
+<body onload="startWebGL()">
     <h1>Final Project</h1>
 
     <!-- embed the HTML5 Canvas Drawing object on the page.-->
