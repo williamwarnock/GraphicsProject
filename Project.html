@@ -38,17 +38,17 @@
   varying vec3 vLightWeight;
   varying vec3 vNormalVertexPosition;
   varying vec4 clrVec;
- // varying nClrVec;
+  varying vec4 nclrVec;
   varying vec2 vTextureCoord;
   void main(void){
-      /*nVertexPosition[0] = aVertexPosition[0];
-        nVertexPosition[1] = 0.5;
-        nVertexPosition[2] = aVertexPosition[2];
-        vTextureCoord = aTextureCoord;
-        clrVec = texture2D(uSampler,vTextureCoord);
-        nclrVec = normalize(clrVec);
-        nVertexPosition[1] = nclrVec[0]*nclrVec[0] + nclrVec[1]*nclrVec[1]+nclrVec[2]*nclrVec[2];
-        gl_Position = uPMatrix * uMVMatrix * vec4(nVertexPosition, 1.0);*/
+    vNormalVertexPosition[0] = aVertexPosition[0];
+    vNormalVertexPosition[1] = 0.5;
+    vNormalVertexPosition[2] = aVertexPosition[2];
+    vTextureCoord = aTextureCoord;
+    clrVec = texture2D(uSampler,vTextureCoord);
+    nclrVec = normalize(clrVec);
+    vNormalVertexPosition[1] = nclrVec[0]*nclrVec[0] + nclrVec[1]*nclrVec[1]+nclrVec[2]*nclrVec[2];
+    gl_Position = uniformProjectionMatrix * uniformModelViewMatrix * vec4(vNormalVertexPosition, 1.0);
         
     vec3 testNorm = aVertexNormal;
     vec3 transformedNormal = uNormalMatrix *  aVertexNormal;
@@ -137,7 +137,7 @@ function initShader(){
   sProg.vertexPositionAttribute = gl.getAttribLocation(sProg, "aVertexPosition");
   gl.enableVertexAttribArray(sProg.vertexPositionAttribute);
   sProg.vertexNormalAtribute = gl.getAttribLocation(sProg, "aVertexNormal");
-  gl.enableVertexAttribArray(sProg.vertexNormalAtribute);
+  gl.enableVertexAttribArray(sProg.vertexNormalAttribute);
   sProg.vertexPositionAttribute = gl.getAttribLocation(sProg, "aTextureCoord");
   gl.enableVertexAttribArray(sProg.textureCoordAttribute);
   sProg.projectionMatrixUniform = gl.getUniformLocation(sProg, "uniformProjectionMatrix");
@@ -204,7 +204,7 @@ function makePlaneGeometry(){
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuff);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalVertices), gl.STATIC_DRAW);
   normalBuff.itemSize = 3;
-  normalBuff.numItems = 10000;
+  normalBuff.numItems = 100*100;
   
   vertexTextureCoordBuff = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureCoordBuff);
@@ -239,13 +239,10 @@ function makePlaneGeometry(){
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertexIndicies), gl.STATIC_DRAW);
   vertexIndexBuff.itemSize = 1;
   vertexIndexBuff.numItems = tvi;
-  console.log("here");
 }
 
 function initGeometry(){
   makePlaneGeometry();
-    console.log("here");
-
 }
 
 var texture;
@@ -255,18 +252,16 @@ function initTexture(){
   texture.image.onload = function(){
     handleLoadedTexture(texture)
   }
-  texture.image.src = "racetrackEdit.png";
+  texture.image.src = "racetrack.png";
 }
 
 function handleLoadedTexture(textures){
   gl.bindTexture(gl.TEXTURE_2D, textures);
-  gl.pixelStorei(gl.INPACK_FLIP_Y_WEBGL, true);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures.image);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.bindTexture(gl.TEXTURE_2D, null);
-      console.log("here");
-
 }
 
 function startWebGL(){
@@ -277,7 +272,7 @@ function startWebGL(){
   
   var canvas = document.getElementById("projectCanvas");
 
-  gl.clearColor(1.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0.4, 0.4, 0.4, 1.0);
   gl.enable(gl.DEPTH_TEST);
   Frames();
 }
@@ -286,7 +281,9 @@ function bindBuffers(){
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuff);
   gl.vertexAttribPointer(sProg.vertexPositionAttribute, vertexPositionBuff.itemSize, gl.FLOAT, false, 0,0);
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuff);
-  gl.vertexAttribPointer(sProg.vertexNormalAtribute, normalBuff.itemSize, gl.FLOAT, false, 0,0);
+  gl.vertexAttribPointer(sProg.vertexNormalAttribute, normalBuff.itemSize, gl.FLOAT, false, 0,0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureCoordBuff);
+  gl.vertexAttribPointer(sProg.texterCoordAttribute, vertexTextureCoordBuff.itemSize, gl.FLOAT, false, 0, 0);
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.uniform1i(sProg.samplerUniform, 0);
@@ -308,7 +305,7 @@ function drawScene(){
   
   bindBuffers();
   
-  gl.uniform3f(sProg.ambientColorUniform, 0.4, 0.0, 0.5);
+  gl.uniform3f(sProg.ambientColorUniform, 0.0, 0.0, 0.5);
   
   var lightingDirection = [0.0, 0.0, 0.0];
   
@@ -332,8 +329,6 @@ function animate(){
 }
 
 function Frames(){
-      console.log("here");
-
   requestAnimFrame(Frames);
   drawScene();
 }
