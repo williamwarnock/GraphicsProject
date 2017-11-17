@@ -8,7 +8,6 @@
 <!-- load matrix manipulation helper methods -->	
 <script type="text/javascript" src="glMatrix_util.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
-<script type="text/javascript" src="mouse_util.js"></script>
 
 <!-- define our shaders -->
 <script id="shader-fs" type="x-shader/x-fragment">
@@ -394,9 +393,6 @@ function startWebGL()
    
 // set mouse handlers for controlling rotation
    var acanvas = document.getElementById("finalProject");
-   acanvas.onmousedown = handleMouseDown;
-   document.onmouseup = handleMouseUp;   // handle when mouse moves out of canvas
-   document.onmousemove = handleMouseMove;
    document.onkeydown = handleKeyDown;
    document.onkeyup = handleKeyUp;
    
@@ -428,7 +424,6 @@ function startWebGL()
         mat4.translate(mvMatrix, [0.0, -2.0, -5.0]);
         mat4.scale(mvMatrix, [100.0, 1.0, 100.0]);
        // handle the mouse controlled object rotation and keys
-        mat4.multiply(mvMatrix,objRotationMatrix);
         mat4.rotate(mvMatrix, degToRad(-yaw), [0, 1, 0]);
         mat4.translate(mvMatrix, [-xPos, -yPos, -zPos]);
         
@@ -451,15 +446,11 @@ function startWebGL()
 // lighting code
             gl.uniform3f(
                 shaderProgram.ambientColorUniform,
-                parseFloat(document.getElementById("ambientR").value),
-                parseFloat(document.getElementById("ambientG").value),
-                parseFloat(document.getElementById("ambientB").value)
+                0.2, 0.2, 0.2
             );
 
             var lightingDirection = [
-                parseFloat(document.getElementById("lightDirectionX").value),
-                parseFloat(document.getElementById("lightDirectionY").value),
-                parseFloat(document.getElementById("lightDirectionZ").value)
+                0.0, -1.0, 0.0
             ];
             var adjustedLD = vec3.create();
             vec3.normalize(lightingDirection, adjustedLD);
@@ -468,9 +459,7 @@ function startWebGL()
 
             gl.uniform3f(
                 shaderProgram.directionalColorUniform,
-                parseFloat(document.getElementById("directionalR").value),
-                parseFloat(document.getElementById("directionalG").value),
-                parseFloat(document.getElementById("directionalB").value)
+                0.8, 0.8, 0.8
             );
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terVertexIndexBuffer);
@@ -516,41 +505,14 @@ function startWebGL()
 <!-- the onload attribute specifies a javascript function to execute when the body tag is loaded into the browser -->
 
 <body onload="startWebGL()">
-<h1>WebGL Lighted Terrain with Mouse Controls</h1>
+<h1>Final Project</h1>
 
 <!-- embed the HTML5 Canvas Drawing object on the page.-->
 <!-- Name the canvas 'finalProject' for the javascript code. -->
-<canvas id="finalProject" width=640 height=480>
+<canvas id="finalProject" width=800 height=700>
 If you're seeing this your web browser doesn't support the &lt;canvas>&gt; element. Ouch!
 </canvas>
 
-// lighting controls
-<h2>Directional light:</h2>
-
-    <table style="border: 0; padding: 10px;">
-        <tr>
-            <td><b>Direction:</b>
-            <td>X: <input type="text" id="lightDirectionX" value="0.0" />
-            <td>Y: <input type="text" id="lightDirectionY" value="-1.0" />
-            <td>Z: <input type="text" id="lightDirectionZ" value="0.0" />
-        </tr>
-        <tr>
-            <td><b>Colour:</b>
-            <td>R: <input type="text" id="directionalR" value="0.8" />
-            <td>G: <input type="text" id="directionalG" value="0.8" />
-            <td>B: <input type="text" id="directionalB" value="0.8" />
-        </tr>
-    </table>
-
-    <h2>Ambient light:</h2>
-    <table style="border: 0; padding: 10px;">
-        <tr>
-            <td><b>Colour:</b>
-            <td>R: <input type="text" id="ambientR" value="0.2" />
-            <td>G: <input type="text" id="ambientG" value="0.2" />
-            <td>B: <input type="text" id="ambientB" value="0.2" />
-        </tr>
-    </table>
 
 </body>
 </html>
