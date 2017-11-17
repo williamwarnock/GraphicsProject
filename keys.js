@@ -1,4 +1,9 @@
 var currentlyPressedKeys = {};
+   
+function degToRad(degrees) {
+  return degrees * Math.PI / 180;
+
+}
 
 function handleKeyDown(event) {
   currentlyPressedKeys[event.keyCode] = true;
@@ -10,16 +15,6 @@ function handleKeyUp(event) {
 }
 
 function handleKeys() {
-  if (currentlyPressedKeys[33]) {
-     // Page Up
-     pitchRate = 0.1;
-  }else if (currentlyPressedKeys[34]) {
-    // Page Down
-    pitchRate = -0.1;
-  }else{
-    pitchRate = 0;
-	  
-  }
 
   if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
      // Left cursor key or A

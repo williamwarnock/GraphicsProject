@@ -2,15 +2,13 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Final Project</title>
+	<title>Lighted Terrain</title>
 	<meta name="generator" content="BBEdit 10.5" />
 
 <!-- load matrix manipulation helper methods -->	
 <script type="text/javascript" src="glMatrix_util.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
 <script type="text/javascript" src="mouse_util.js"></script>
-<!--<script type="text/javascript" src="keys.js"></script>-->
-
 
 <!-- define our shaders -->
 <script id="shader-fs" type="x-shader/x-fragment">
@@ -97,7 +95,7 @@ function initWebGLContext(aname) {
 function initGLScene()
 {
     // Initialize the WebGL Context - the gl engine for drawing things.
-    var gl = initWebGLContext("finalproject"); // The id of the Canvas Element
+    var gl = initWebGLContext("finalProject"); // The id of the Canvas Element
         if (!gl) // if fails simply return
      {
           return;
@@ -212,17 +210,10 @@ function setMatrixUniforms()
         gl.uniformMatrix3fv(shaderProgram.tnMatrixUniform, false, normalMatrix);
 }
 
-function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-    }
 
-
-    function degToRad(degrees) {
+function degToRad(degrees) {
         return degrees * Math.PI / 180;
     }
-
-
 
     var currentlyPressedKeys = {};
 
@@ -280,8 +271,6 @@ function setMatrixUniforms() {
         }
 
     }
-
-
 
 // create and initialize our geometry objects
 var terVertexPositionBuffer;
@@ -404,16 +393,15 @@ function startWebGL()
    initTextures();
    
 // set mouse handlers for controlling rotation
-   var acanvas = document.getElementById("finalproject");
+   var acanvas = document.getElementById("finalProject");
    acanvas.onmousedown = handleMouseDown;
    document.onmouseup = handleMouseUp;   // handle when mouse moves out of canvas
    document.onmousemove = handleMouseMove;
    document.onkeydown = handleKeyDown;
    document.onkeyup = handleKeyUp;
    
-   gl.clearColor(0.4,0.4,0.4,1.0);
+   gl.clearColor(0.1,0.4,1.0,1.0);
    gl.enable(gl.DEPTH_TEST);
-
    // Draw the Scene
    Frames();
    // If doing an animation need to add code to rotate our geometry
@@ -437,14 +425,13 @@ function startWebGL()
 
         mat4.identity(mvMatrix);
 
-        mat4.translate(mvMatrix, [0.0, 0.0, -5.0]);
-       // handle the mouse controlled object rotation
-        mat4.multiply(mvMatrix,objRotationMatrix);
+        mat4.translate(mvMatrix, [0.0, -2.0, -5.0]);
         mat4.scale(mvMatrix, [100.0, 1.0, 100.0]);
-
+       // handle the mouse controlled object rotation and keys
+        mat4.multiply(mvMatrix,objRotationMatrix);
         mat4.rotate(mvMatrix, degToRad(-yaw), [0, 1, 0]);
-
         mat4.translate(mvMatrix, [-xPos, -yPos, -zPos]);
+        
 
         gl.bindBuffer(gl.ARRAY_BUFFER, terVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, terVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -464,11 +451,15 @@ function startWebGL()
 // lighting code
             gl.uniform3f(
                 shaderProgram.ambientColorUniform,
-                0.2, 0.2, 0.2
+                parseFloat(document.getElementById("ambientR").value),
+                parseFloat(document.getElementById("ambientG").value),
+                parseFloat(document.getElementById("ambientB").value)
             );
 
             var lightingDirection = [
-                0.0, -1.0, 0.0
+                parseFloat(document.getElementById("lightDirectionX").value),
+                parseFloat(document.getElementById("lightDirectionY").value),
+                parseFloat(document.getElementById("lightDirectionZ").value)
             ];
             var adjustedLD = vec3.create();
             vec3.normalize(lightingDirection, adjustedLD);
@@ -477,7 +468,9 @@ function startWebGL()
 
             gl.uniform3f(
                 shaderProgram.directionalColorUniform,
-                0.8, 0.8, 0.8
+                parseFloat(document.getElementById("directionalR").value),
+                parseFloat(document.getElementById("directionalG").value),
+                parseFloat(document.getElementById("directionalB").value)
             );
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terVertexIndexBuffer);
@@ -502,10 +495,10 @@ function startWebGL()
 	       
            }
                        yaw += yawRate * elapsed;
-
         }
         lastTime = timeNow;
     }
+
 
     function Frames() {
         requestAnimFrame(Frames);
@@ -523,14 +516,15 @@ function startWebGL()
 <!-- the onload attribute specifies a javascript function to execute when the body tag is loaded into the browser -->
 
 <body onload="startWebGL()">
-<h1>Final Project</h1>
+<h1>WebGL Lighted Terrain with Mouse Controls</h1>
 
 <!-- embed the HTML5 Canvas Drawing object on the page.-->
-<!-- Name the canvas 'finalproject' for the javascript code. -->
-<canvas id="finalproject" width=800 height=800>
+<!-- Name the canvas 'finalProject' for the javascript code. -->
+<canvas id="finalProject" width=640 height=480>
 If you're seeing this your web browser doesn't support the &lt;canvas>&gt; element. Ouch!
 </canvas>
-<!--// lighting controls
+
+// lighting controls
 <h2>Directional light:</h2>
 
     <table style="border: 0; padding: 10px;">
@@ -557,6 +551,6 @@ If you're seeing this your web browser doesn't support the &lt;canvas>&gt; eleme
             <td>B: <input type="text" id="ambientB" value="0.2" />
         </tr>
     </table>
-    -->
+
 </body>
 </html>
