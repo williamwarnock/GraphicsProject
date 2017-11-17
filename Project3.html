@@ -239,6 +239,8 @@ function degToRad(degrees) {
     var speed = 0;
 
     function handleKeys() {
+	
+    
         if (currentlyPressedKeys[33]) {
             // Page Up
             pitchRate = 0.1;
@@ -261,13 +263,15 @@ function degToRad(degrees) {
 
         if (currentlyPressedKeys[38] || currentlyPressedKeys[87]) {
             // Up cursor key or W
-            speed = 0.0003;
+            if(speed < 0.001){
+	      speed += 0.000001;
+	    }
         } else if (currentlyPressedKeys[40] || currentlyPressedKeys[83]) {
             // Down cursor key
-            speed = -0.0003;
-        } else {
-            speed = 0;
-        }
+             if(speed > -0.0001){
+		speed += -0.000001;
+	    }
+        } 
 
     }
 
