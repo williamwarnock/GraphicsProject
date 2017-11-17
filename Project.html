@@ -8,6 +8,8 @@
     
 <script type="text/javascript" src="glMatrix_util.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="mouse_util.js"></script>
+
 
 <script type="text/javascript" src="keys.js"></script>
 
@@ -18,7 +20,7 @@
   uniform sampler2D uSampler;
   void main(void){
     vec4 tx_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+    gl_FragColor = vec4(tx_FragColor.rgb*vLightWeight, tx_FragColor.a);
   }
 </script>
 
@@ -65,7 +67,7 @@ function initWGLContext(name){
   gl = null;
   var canvas = document.getElementById(name);
   try{
-    gl = canvas.getContext("webgl") || canval.getContext("experimental-webgl");
+    gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
   }catch(e){}
   
   if(!gl){
@@ -93,16 +95,16 @@ function getShader(gl, id){
   var str = "";
   var child = shaderSc.firstChild;
   while(child){
-    if(child.nodeType===3){
+    if(child.nodeType==3){
       str+=child.textContent;
     }
     child = child.nextSibling;
   }
   
   var shader;
-  if(shaderSc.type === "x-shader/x-fragment"){
+  if(shaderSc.type == "x-shader/x-fragment"){
     shader = gl.createShader(gl.FRAGMENT_SHADER);
-  }else if(shaderSc.type === "x-shader/x-vertex"){
+  }else if(shaderSc.type == "x-shader/x-vertex"){
     shader = gl.createShader(gl.VERTEX_SHADER);
   }else{
     return null
@@ -136,10 +138,13 @@ function initShader(){
   
   sProg.vertexPositionAttribute = gl.getAttribLocation(sProg, "aVertexPosition");
   gl.enableVertexAttribArray(sProg.vertexPositionAttribute);
+  
   sProg.vertexNormalAtribute = gl.getAttribLocation(sProg, "aVertexNormal");
   gl.enableVertexAttribArray(sProg.vertexNormalAttribute);
+  
   sProg.vertexPositionAttribute = gl.getAttribLocation(sProg, "aTextureCoord");
   gl.enableVertexAttribArray(sProg.textureCoordAttribute);
+  
   sProg.projectionMatrixUniform = gl.getUniformLocation(sProg, "uniformProjectionMatrix");
   sProg.modelViewMatrixUniform = gl.getUniformLocation(sProg, "uniformModelViewMatrix");
   sProg.samplerUniform = gl.getUniformLocation(sProg, "uSampler");
@@ -171,6 +176,7 @@ function setMatUniforms(){
   gl.uniformMatrix4fv(sProg.modelViewMatrixUniform, false, modelViewMatrix);
   var normMatrix = mat3.create();
   mat4.toInverseMat3(modelViewMatrix, normMatrix);
+  mat3.transpose(normMatrix);
   gl.uniformMatrix3fv(sProg.tnMatrixUniform, false, normMatrix);
 }
 
@@ -252,7 +258,7 @@ function initTexture(){
   texture.image.onload = function(){
     handleLoadedTexture(texture)
   }
-  texture.image.src = "racetrack.png";
+  texture.image.src = "cats.jpg";
 }
 
 function handleLoadedTexture(textures){
@@ -270,7 +276,10 @@ function startWebGL(){
   initGeometry();
   initTexture();
   
-  var canvas = document.getElementById("projectCanvas");
+  var acanvas = document.getElementById("projectCanvas");
+     acanvas.onmousedown = handleMouseDown;
+   document.onmouseup = handleMouseUp;   // handle when mouse moves out of canvas
+   document.onmousemove = handleMouseMove;
 
   gl.clearColor(0.4, 0.4, 0.4, 1.0);
   gl.enable(gl.DEPTH_TEST);
@@ -301,7 +310,7 @@ function drawScene(){
   mat4.perspective(45, gl.viewportWidth/gl.viewportHeigth, 0.1, 100.0, projectionMatrix);
   mat4.identity(modelViewMatrix);
   mat4.translate(modelViewMatrix, [0.0, 0.0, -5.0]);
-  //mat4.multiply(modelViewMatrix, objectRotationMatrix);
+  mat4.multiply(modelViewMatrix, objRotationMatrix);
   
   bindBuffers();
   
