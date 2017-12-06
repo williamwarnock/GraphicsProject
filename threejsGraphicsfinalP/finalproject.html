@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>My first three.js app</title>
+		<title>Final Project</title>
 		<style>
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
@@ -53,6 +53,7 @@
 			// load a texture, set wrap mode to repeat
 			var texture = new THREE.TextureLoader().load( "textures/racetrackEdit.png" );
 			var textureSky = new THREE.TextureLoader().load("textures/cloudy.jpg");
+			var textureCone = new THREE.TextureLoader().load("textures/cone.jpg");
 
 			//Skybox
 			var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
@@ -72,8 +73,18 @@
             var carMaterial = new THREE.MeshPhongMaterial({color: 0x45a081, side: THREE.DoubleSide});
 			var carGeometry = new THREE.CubeGeometry(10, 10, 10, 1, 1, 1, carMaterial);
 			car = new THREE.Mesh(carGeometry, carMaterial);
-			car.position.set(0, 5, 0);
+			car.position.set(0, 7, 0);
 			scene.add(car);
+
+			//cones
+			for(i = 0; i < 200; i++) {
+			    // var coneMaterial = new THREE.MeshPhongMaterial({color: 0xff6600, side: THREE.DoubleSide});
+                var coneMaterial = new THREE.MeshPhongMaterial({map: textureCone, side: THREE.DoubleSide});
+				var coneGeometry = new THREE.CylinderGeometry(1, 5, 15, 32);
+			    var cone = new THREE.Mesh(coneGeometry, coneMaterial);
+			    cone.position.set(Math.floor((Math.random() * 1000) + -500), 7, Math.floor((Math.random() * 1000) + -500));
+			    scene.add( cone );
+			}
 			
 		}
 		
