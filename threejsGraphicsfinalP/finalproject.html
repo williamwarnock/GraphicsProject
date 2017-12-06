@@ -43,7 +43,8 @@
 			scene.add(sky);
 			
 			var geometry = new THREE.PlaneGeometry( 1000, 1000, 10, 10);
-			var material = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
+//			var material = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
+            var material = new THREE.MeshPhongMaterial( { map: texture, side: THREE.DoubleSide } );
 			var plane = new THREE.Mesh( geometry, material );
 			plane.position.y = -0.5;
 			plane.rotation.x = Math.PI/2;
@@ -51,16 +52,20 @@
 			scene.add( plane );	
 			
 			//car/cube
-			var carMaterial = new THREE.MeshBasicMaterial({color: 0x45a081, side: THREE.DoubleSide});
+//			var carMaterial = new THREE.MeshBasicMaterial({color: 0x45a081, side: THREE.DoubleSide});
+            var carMaterial = new THREE.MeshPhongMaterial({color: 0x45a081, side: THREE.DoubleSide});
 			var carGeometry = new THREE.CubeGeometry(10, 10, 10, 1, 1, 1, carMaterial);
 			car = new THREE.Mesh(carGeometry, carMaterial);
+			car.castShadow = true;
+			car.receiveShadow = true;
 			car.position.set(0, 2.1, 0);
 			scene.add(car);
 			
 			
 			//lighting
-			var light = new THREE.PointLight(0x45a081);
-			light.position.set(0,250,0);
+			var light = new THREE.PointLight(0xffffff, 1, 2000, 1);
+			light.position.set(0, 100, -100);
+			light.castShadow = true;
 			scene.add(light);
 			
 			
@@ -71,6 +76,8 @@
 		function animate(){
 			requestAnimationFrame(animate);
 			renderer.render(scene, camera);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			update();
 		}
 		
