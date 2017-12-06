@@ -34,6 +34,8 @@
             var light = new THREE.PointLight(0xffffff, 1, 2000, 1);
             light.position.set(0, 100, -100);
             light.castShadow = true;
+			light.shadowDarkness = 0.5;
+			light.shadowCameraVisible = true;
             scene.add(light);
 
             //Set up shadow properties for the light
