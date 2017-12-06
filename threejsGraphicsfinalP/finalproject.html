@@ -27,54 +27,52 @@
 			var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH/SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 			camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 			scene.add(camera);
-			camera.position.set(0, 42, 100);
+			//camera.position.set(0, 42, 100);
+            //camera.position.set(0, 100, 700);
 			camera.lookAt(scene.position);
 
-			//lighting
-            var light = new THREE.PointLight(0xffffff, 1, 2000, 1);
-            light.position.set(0, 100, -100);
-            light.castShadow = true;
-			light.shadowDarkness = 0.5;
-			light.shadowCameraVisible = true;
+			//Renderer
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            document.body.appendChild( renderer.domElement );
+
+            //lighting
+            //var light = new THREE.PointLight(0xffffff, 1.5, 2000, 0);
+            var light = new THREE.DirectionalLight(0xffffff, 1.75);
+            light.position.set(500, 500, 500);
+            //light.position.set(20, 5, 0);
             scene.add(light);
 
-            //Set up shadow properties for the light
-            light.shadow.mapSize.width = 512;  // default
-            light.shadow.mapSize.height = 512; // default
-            light.shadow.camera.near = 0.5;       // default
-            light.shadow.camera.far = 500      // default
+            var aLight = new THREE.AmbientLight( 0x404040, 1 );
+            scene.add( aLight );
 
-			renderer = new THREE.WebGLRenderer();
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
+            var sphereSize = 1;
+            var pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
+            scene.add( pointLightHelper );
+
 			// load a texture, set wrap mode to repeat
 			var texture = new THREE.TextureLoader().load( "textures/racetrackEdit.png" );
 			var textureSky = new THREE.TextureLoader().load("textures/cloudy.jpg");
 
+			//Skybox
 			var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
 			var skyBoxMaterial = new THREE.MeshBasicMaterial({map: textureSky, side: THREE.BackSide});
 			var sky = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
 			scene.add(sky);
-			
+
+			//Plane Geometry
 			var geometry = new THREE.PlaneGeometry( 1000, 1000, 10, 10);
-//			var material = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
             var material = new THREE.MeshPhongMaterial( { map: texture, side: THREE.DoubleSide } );
-            material.castShadow = false;
-            material.receiveShadow = true;
 			var plane = new THREE.Mesh( geometry, material );
 			plane.position.y = -0.5;
 			plane.rotation.x = Math.PI/2;
-			
 			scene.add( plane );	
 			
 			//car/cube
-//			var carMaterial = new THREE.MeshBasicMaterial({color: 0x45a081, side: THREE.DoubleSide});
             var carMaterial = new THREE.MeshPhongMaterial({color: 0x45a081, side: THREE.DoubleSide});
 			var carGeometry = new THREE.CubeGeometry(10, 10, 10, 1, 1, 1, carMaterial);
 			car = new THREE.Mesh(carGeometry, carMaterial);
-			car.castShadow = true;
-			car.receiveShadow = true;
-			car.position.set(0, 2.1, 0);
+			car.position.set(0, 5, 0);
 			scene.add(car);
 			
 		}
@@ -84,31 +82,35 @@
 		function animate(){
 			requestAnimationFrame(animate);
 			renderer.render(scene, camera);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            // renderer.shadowMap.enabled = true;
+            // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			update();
 		}
 		
 		function update() {
-		  var delta = clock.getData();
+		  var delta = clock.getDelta();
 		  var moveDistance = 200 * delta;
 		  var rotationAngle = Math.PI/2*delta;
 		  
-		  if(keyboard.pressed(38)){
+		  if(keyboard.pressed("W")){
 		    car.translateZ(-moveDistance);
 		  }
-		  if(keyboard.pressed(40)){
+		  if(keyboard.pressed("S")){
 		    car.translateZ(moveDistance);
 		  }
 		  
 		  var rotation_matrix = new THREE.Matrix4().identity();
-		  if(keyboard.pressed(37)){
+		  if(keyboard.pressed("A")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
 		  }
-		    if(keyboard.pressed(39)){
+
+		  if(keyboard.pressed("D")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotationAngle);
 		  }
-		 var cameraOffset = relativeCameraOffset.applyMatrix4(car.matrixWorld);
+
+		  var relativeCameraOffset = new THREE.Vector3(0,50,200);
+		  var cameraOffset = relativeCameraOffset.applyMatrix4(car.matrixWorld);
+
 		  camera.position.x = cameraOffset.x;
 		  camera.position.y = cameraOffset.y;
 		  camera.position.z = cameraOffset.z;
