@@ -15,14 +15,17 @@
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
+			// load a texture, set wrap mode to repeat
+			var texture = new THREE.TextureLoader().load( "textures/racetrackEdit.png" );
 
-			var geometry = new THREE.PlaneGeometry( 1, 1, 1);
-			var material = new THREE.MeshBasicMaterial( { color: 0x00ff00, side: THREE.DoubleSide } );
+			var geometry = new THREE.PlaneGeometry( 100, 100, 100);
+			var material = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
 			var plane = new THREE.Mesh( geometry, material );
 			scene.add( plane );
 
 			plane.rotation.x = 3.14159/2;
-			camera.position.z = 5;
+			camera.position.z = 1;
+			camera.position.y = 1;
 
 			var animate = function () {
 				requestAnimationFrame( animate );
