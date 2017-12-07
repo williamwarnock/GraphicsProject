@@ -136,6 +136,8 @@
             var objectLoader = new THREE.ObjectLoader();
             objectLoader.load("car2/camero-2010-low-poly.json", function ( obj ) {
                 obj.scale.set(15, 15, 15);
+                obj.position.x = -2000;
+                obj.position.z = 90;
                 car = obj;
 
                 scene.add( car );
