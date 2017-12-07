@@ -17,6 +17,8 @@
 		var car;
 		var clock = new THREE.Clock();
 		var keyboard = new THREEx.KeyboardState();
+		var collidableMeshList = [];
+
 		
 		init();
 		animate();
@@ -77,6 +79,8 @@
 			   wallEast.position.set(5000/2, 7, i *100);
 			  wallEast.rotation.y = Math.PI/2;
 			  scene.add(wallEast);
+			  collidableMeshList.push(wallEast);
+
 			}
 			
 			//west wall
@@ -86,6 +90,7 @@
 			  var wallWest = new THREE.Mesh(wallWestGeometry, wallWestMaterial);
 			   wallWest.position.set(-5000/2, 7, i *100);
 			  wallWest.rotation.y = Math.PI/2;
+			  collidableMeshList.push(wallWest);
 			  scene.add(wallWest);
 			}
 			
@@ -103,15 +108,18 @@
 			  var wallSouthMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
 			  var wallSouth = new THREE.Mesh(wallSouthGeometry, wallSouthMaterial);
 			   wallSouth.position.set(i *100, 7, 5000/2);
+			   collidableMeshList.push(wallSouth);
 			  scene.add(wallSouth);
 			}
 			
 			//car/cube
-            // var carMaterial = new THREE.MeshPhongMaterial({color: 0x45a081, side: THREE.DoubleSide});
-			// var carGeometry = new THREE.CubeGeometry(10, 10, 10, 1, 1, 1, carMaterial);
-			// car = new THREE.Mesh(carGeometry, carMaterial);
-			// car.position.set(0, 7, 0);
-			// scene.add(car);
+             var cubeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
+			 var cubeGeometry = new THREE.CubeGeometry(27, 27, 27, 1, 1, 1, cubeMaterial);
+			 cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+			 cube.position.set(0, 7, 0);
+			 cube.material.transparent = true;
+			 cube.material.opacity = 0;
+			 scene.add(cube);
 
 			//cones
 			for(i = 0; i < 500; i++) {
@@ -120,7 +128,8 @@
 				var coneGeometry = new THREE.CylinderGeometry(1, 5, 15, 32);
 			    var cone = new THREE.Mesh(coneGeometry, coneMaterial);
 			    cone.position.set(Math.floor((Math.random() * 5000) + -2500), 7, Math.floor((Math.random() * 5000) + -2500));
-			    scene.add( cone );
+			   collidableMeshList.push(cone);
+			   scene.add( cone );
 			}
 
             // car
@@ -142,8 +151,10 @@
 			update();
 			 if(pressedUpDown == 1){
 		    car.translateZ(moveDistance);
+		    cube.translateZ(moveDistance);
 		  }
 			}
+			
 
 		}
 		var pressedUpDown = 0;
@@ -172,19 +183,38 @@
 		  var rotation_matrix = new THREE.Matrix4().identity();
 		  if(keyboard.pressed("A")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
+		    cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
+
 		  }
 
 		  if(keyboard.pressed("D")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotationAngle);
+		    cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotationAngle);
 		  }
+		  
+
 
 		  var relativeCameraOffset = new THREE.Vector3(0,5,15);
 		  var cameraOffset = relativeCameraOffset.applyMatrix4(car.matrixWorld);
-
+		  
+		  var originPoint = cube.position.clone();
+		  for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++) {		
+		    var localVertex = cube.geometry.vertices[vertexIndex].clone();
+		    var globalVertex = localVertex.applyMatrix4( cube.matrix );
+		    var directionVector = globalVertex.sub( cube.position );
+		
+		    var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+		    var collisionResults = ray.intersectObjects( collidableMeshList );
+		    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
+		      moveDistance = 0;
+		    }	
+		  
 		  camera.position.x = cameraOffset.x;
 		  camera.position.y = cameraOffset.y;
 		  camera.position.z = cameraOffset.z;
 		  camera.lookAt(car.position);
+		  
+
 		}
 		
 		</script>
