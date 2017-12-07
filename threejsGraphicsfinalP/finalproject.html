@@ -18,7 +18,6 @@
 		var clock = new THREE.Clock();
 		var keyboard = new THREEx.KeyboardState();
 		var collidableMeshList = [];
-
 		
 		init();
 		animate();
@@ -30,39 +29,32 @@
 			camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 			scene.add(camera);
 			camera.lookAt(scene.position);
-
 			//Renderer
             renderer = new THREE.WebGLRenderer();
             renderer.setSize( window.innerWidth, window.innerHeight );
             document.body.appendChild( renderer.domElement );
-
             //lighting
             //var light = new THREE.PointLight(0xffffff, 1.5, 2000, 0);
             var light = new THREE.DirectionalLight(0xffffff, 1.75);
             light.position.set(-500, 500, -500);
             //light.position.set(0, 5, 0);
             scene.add(light);
-
             var aLight = new THREE.AmbientLight( 0x404040, 1 );
             scene.add( aLight );
-
             var sphereSize = 1;
             var pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
             scene.add( pointLightHelper );
-
 			// load a texture, set wrap mode to repeat
 			var texture = new THREE.TextureLoader().load( "textures/racetrackEdit.png" );
 			var textureSky = new THREE.TextureLoader().load("textures/cloudy.jpg");
 			var textureCone = new THREE.TextureLoader().load("textures/cone.jpg");
 			var textureWalls = new THREE.TextureLoader().load("textures/wall.jpg");
 						
-
 			//Skybox
 			var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
 			var skyBoxMaterial = new THREE.MeshBasicMaterial({map: textureSky, side: THREE.BackSide});
 			var sky = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
 			scene.add(sky);
-
 			//Plane Geometry
 			var geometry = new THREE.PlaneGeometry( 5000, 5000, 10, 10);
             var material = new THREE.MeshPhongMaterial( { map: texture, side: THREE.DoubleSide } );
@@ -80,7 +72,6 @@
 			  wallEast.rotation.y = Math.PI/2;
 			  scene.add(wallEast);
 			  collidableMeshList.push(wallEast);
-
 			}
 			
 			//west wall
@@ -120,7 +111,6 @@
 			 cube.material.transparent = true;
 			 cube.material.opacity = 0;
 			 scene.add(cube);
-
 			//cones
 			for(i = 0; i < 500; i++) {
 			    // var coneMaterial = new THREE.MeshPhongMaterial({color: 0xff6600, side: THREE.DoubleSide});
@@ -131,19 +121,14 @@
 			   collidableMeshList.push(cone);
 			   scene.add( cone );
 			}
-
             // car
             var objectLoader = new THREE.ObjectLoader();
             objectLoader.load("car2/camero-2010-low-poly.json", function ( obj ) {
                 obj.scale.set(15, 15, 15);
-                obj.position.x = -2000;
-                obj.position.z = 90;
                 car = obj;
-
                 scene.add( car );
             } );
 		}
-
 		function animate(){
 			requestAnimationFrame(animate);
 			renderer.render(scene, camera);
@@ -157,19 +142,15 @@
 		  }
 			}
 			
-
 		}
 		var pressedUpDown = 0;
 		
 		var delta = clock.getDelta();
 		var moveDistance = 200 * delta;
-
 		function update() {
 		  delta = clock.getDelta();
 		  var rotationAngle = Math.PI/2*delta;	
 		
-
-
 		  if(keyboard.pressed("W")){
 		    pressedUpDown = 1;
 		    moveDistance -=0.1;
@@ -180,22 +161,17 @@
 		    moveDistance += 0.1;
 		   // car.translateZ(moveDistance);
 		  }
-
 		  
 		  var rotation_matrix = new THREE.Matrix4().identity();
 		  if(keyboard.pressed("A")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
 		    cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
-
 		  }
-
 		  if(keyboard.pressed("D")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotationAngle);
 		    cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotationAngle);
 		  }
 		  
-
-
 		  var relativeCameraOffset = new THREE.Vector3(0,5,15);
 		  var cameraOffset = relativeCameraOffset.applyMatrix4(car.matrixWorld);
 		  
@@ -216,7 +192,6 @@
 		  camera.position.z = cameraOffset.z;
 		  camera.lookAt(car.position);
 		  
-
 		}
 		
 		</script>
