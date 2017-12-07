@@ -60,7 +60,7 @@
 			scene.add(sky);
 
 			//Plane Geometry
-			var geometry = new THREE.PlaneGeometry( 1000, 1000, 10, 10);
+			var geometry = new THREE.PlaneGeometry( 5000, 5000, 10, 10);
             var material = new THREE.MeshPhongMaterial( { map: texture, side: THREE.DoubleSide } );
 			var plane = new THREE.Mesh( geometry, material );
 			plane.position.y = -0.5;
@@ -75,12 +75,12 @@
 			// scene.add(car);
 
 			//cones
-			for(i = 0; i < 100; i++) {
+			for(i = 0; i < 500; i++) {
 			    // var coneMaterial = new THREE.MeshPhongMaterial({color: 0xff6600, side: THREE.DoubleSide});
                 var coneMaterial = new THREE.MeshPhongMaterial({map: textureCone, side: THREE.DoubleSide});
 				var coneGeometry = new THREE.CylinderGeometry(1, 5, 15, 32);
 			    var cone = new THREE.Mesh(coneGeometry, coneMaterial);
-			    cone.position.set(Math.floor((Math.random() * 1000) + -500), 7, Math.floor((Math.random() * 1000) + -500));
+			    cone.position.set(Math.floor((Math.random() * 5000) + -2500), 7, Math.floor((Math.random() * 5000) + -2500));
 			    scene.add( cone );
 			}
 
@@ -97,25 +97,39 @@
 		function animate(){
 			requestAnimationFrame(animate);
 			renderer.render(scene, camera);
-
+            // renderer.shadowMap.enabled = true;
+            // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			if( car != null) {
-                update();
+			update();
+			 if(pressedUpDown == 1){
+		    car.translateZ(moveDistance);
+		  }
 			}
 
 		}
+		var pressedUpDown = 0;
 		
-		function update() {
-		  var delta = clock.getDelta();
+ var delta = clock.getDelta();
 		  var moveDistance = 200 * delta;
-		  var rotationAngle = Math.PI/2*delta;
+
+		function update() {
+		delta = clock.getDelta();
+		  var rotationAngle = Math.PI/2*delta;	
+		
+
 
 		  if(keyboard.pressed("W")){
-		    car.translateZ(-moveDistance);
+		    pressedUpDown = 1;
+		    moveDistance -=0.1;
+		    //car.translateZ(-moveDistance);
 		  }
 		  if(keyboard.pressed("S")){
-		    car.translateZ(moveDistance);
+		    pressedUpDown = 1;
+		    moveDistance += 0.1;
+		   // car.translateZ(moveDistance);
 		  }
 
+		  
 		  var rotation_matrix = new THREE.Matrix4().identity();
 		  if(keyboard.pressed("A")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
