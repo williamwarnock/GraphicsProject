@@ -52,6 +52,8 @@
 			var texture = new THREE.TextureLoader().load( "textures/racetrackEdit.png" );
 			var textureSky = new THREE.TextureLoader().load("textures/cloudy.jpg");
 			var textureCone = new THREE.TextureLoader().load("textures/cone.jpg");
+			var textureWalls = new THREE.TextureLoader().load("textures/wall.jpg");
+						
 
 			//Skybox
 			var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
@@ -66,6 +68,43 @@
 			plane.position.y = -0.5;
 			plane.rotation.x = Math.PI/2;
 			scene.add( plane );	
+			
+			//east wall
+			for(i = -26; i <26; i++){
+			  var wallEastGeometry = new THREE.CubeGeometry(100, 100, 5);
+			  var wallEastMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
+			  var wallEast = new THREE.Mesh(wallEastGeometry, wallEastMaterial);
+			   wallEast.position.set(5000/2, 7, i *100);
+			  wallEast.rotation.y = Math.PI/2;
+			  scene.add(wallEast);
+			}
+			
+			//west wall
+			for(i = -26; i <26; i++){
+			  var wallWestGeometry = new THREE.CubeGeometry(100, 100, 5);
+			  var wallWestMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
+			  var wallWest = new THREE.Mesh(wallWestGeometry, wallWestMaterial);
+			   wallWest.position.set(-5000/2, 7, i *100);
+			  wallWest.rotation.y = Math.PI/2;
+			  scene.add(wallWest);
+			}
+			
+			//North wall
+			for(i = -26; i <26; i++){
+			  var wallNorthGeometry = new THREE.CubeGeometry(100, 100, 5);
+			  var wallNorthMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
+			  var wallNorth = new THREE.Mesh(wallNorthGeometry, wallNorthMaterial);
+			   wallNorth.position.set(i *100, 7, -5000/2);
+			  scene.add(wallNorth);
+			}
+			//North wall
+			for(i = -26; i <26; i++){
+			  var wallSouthGeometry = new THREE.CubeGeometry(100, 100, 5);
+			  var wallSouthMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
+			  var wallSouth = new THREE.Mesh(wallSouthGeometry, wallSouthMaterial);
+			   wallSouth.position.set(i *100, 7, 5000/2);
+			  scene.add(wallSouth);
+			}
 			
 			//car/cube
             // var carMaterial = new THREE.MeshPhongMaterial({color: 0x45a081, side: THREE.DoubleSide});
@@ -109,11 +148,11 @@
 		}
 		var pressedUpDown = 0;
 		
- var delta = clock.getDelta();
-		  var moveDistance = 200 * delta;
+		var delta = clock.getDelta();
+		var moveDistance = 200 * delta;
 
 		function update() {
-		delta = clock.getDelta();
+		  delta = clock.getDelta();
 		  var rotationAngle = Math.PI/2*delta;	
 		
 
