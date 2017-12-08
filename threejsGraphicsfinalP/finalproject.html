@@ -14,10 +14,13 @@
 
 		<script>
 		var scene, camera, renderer, controls, container;
-		var car;
+		var car, c1, c2, throughStart, throughC1, throughC2, throughFinish;
 		var clock = new THREE.Clock();
 		var keyboard = new THREEx.KeyboardState();
 		var collidableMeshList = [];
+		var checkpoint1 = [];
+		var checkpoint2 = [];
+		var finishline = [];
 		
 		init();
 		animate();
@@ -91,6 +94,8 @@
 			  var wallNorthMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
 			  var wallNorth = new THREE.Mesh(wallNorthGeometry, wallNorthMaterial);
 			   wallNorth.position.set(i *100, 7, -5000/2);
+			   	collidableMeshList.push(wallNorth);
+
 			  scene.add(wallNorth);
 			}
 			//North wall
@@ -102,15 +107,51 @@
 			   collidableMeshList.push(wallSouth);
 			  scene.add(wallSouth);
 			}
-			
+
+			//invisible finish line
+			var finishGeometry = new THREE.CubeGeometry(550, 100, 50);
+			var finishmaterial = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
+			var finish =  new THREE.Mesh(finishGeometry, finishmaterial);
+			finish.position.x = -1850;
+			finish.position.z = 20;
+			finish.material.transparent = true;
+			finish.material.opacity = 0;
+			scene.add(finish);
+			finishline.push(finish);
+
+			//invisible checkpoint line
+			var checkpoint1Geometry = new THREE.CubeGeometry(550, 100, 50);
+			var checkpoint1material = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
+			c1 =  new THREE.Mesh(checkpoint1Geometry, checkpoint1material);
+			c1.position.x = 800;
+			c1.position.z = -1000;
+			c1.material.transparent = true;
+			c1.material.opacity = 0;
+			scene.add(c1);
+			checkpoint1.push(c1)
+
+			var checkpoint2Geometry = new THREE.CubeGeometry(550, 100, 50);
+			var checkpoint2material = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
+			var c2 =  new THREE.Mesh(checkpoint2Geometry, checkpoint2material);
+			c2.position.x = 800;
+			c2.position.z = 2000;
+			c2.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI/2);
+			c2.material.transparent = true;
+			c2.material.opacity = 0;
+			scene.add(c2);
+			checkpoint2.push(c2)
+
 			//car/cube
              var cubeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
-			 var cubeGeometry = new THREE.CubeGeometry(27, 27, 27, 1, 1, 1, cubeMaterial);
+			 var cubeGeometry = new THREE.CubeGeometry(27, 27, 42, 1, 1, 1, cubeMaterial);
 			 cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 			 cube.position.set(0, 7, 0);
 			 cube.material.transparent = true;
-			 cube.material.opacity = 0;
+			 cube.material.opacity = 0.0;
 			 scene.add(cube);
+			 cube.position.x = -2000;
+			 cube.position.z = 100;
+
 			//cones
 			for(i = 0; i < 500; i++) {
 			    // var coneMaterial = new THREE.MeshPhongMaterial({color: 0xff6600, side: THREE.DoubleSide});
@@ -126,6 +167,9 @@
             objectLoader.load("car2/camero-2010-low-poly.json", function ( obj ) {
                 obj.scale.set(15, 15, 15);
                 car = obj;
+                car.position.x = -2000;
+                car.position.z = 100;
+
                 scene.add( car );
             } );
 		}
@@ -144,9 +188,11 @@
 			
 		}
 		var pressedUpDown = 0;
-		
 		var delta = clock.getDelta();
 		var moveDistance = 200 * delta;
+		var throughFinish = 0;
+		var start = 0;
+
 		function update() {
 		  delta = clock.getDelta();
 		  var rotationAngle = Math.PI/2*delta;	
@@ -154,18 +200,17 @@
 		  if(keyboard.pressed("W")){
 		    pressedUpDown = 1;
 		    moveDistance -=0.1;
-		    //car.translateZ(-moveDistance);
 		  }
 		  if(keyboard.pressed("S")){
 		    pressedUpDown = 1;
 		    moveDistance += 0.1;
-		   // car.translateZ(moveDistance);
 		  }
 		  
 		  var rotation_matrix = new THREE.Matrix4().identity();
 		  if(keyboard.pressed("A")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
 		    cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
+
 		  }
 		  if(keyboard.pressed("D")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotationAngle);
@@ -183,15 +228,66 @@
 		
 		    var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 		    var collisionResults = ray.intersectObjects( collidableMeshList );
-		    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
-		      moveDistance = 0;
-		    }	
+		    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+		      	car.position.set(-2000, 7, 100);
+			 	cube.position.set(-2000, 7, 100);
+			 	throughFinish = 0;
+
+		        alert ("You lose! Do not hit walls or cones! Restart!");
+		      	location.reload();
+
+			}
+		    }
+		    			crossFinish();
+	
 		  
 		  camera.position.x = cameraOffset.x;
 		  camera.position.y = cameraOffset.y;
 		  camera.position.z = cameraOffset.z;
 		  camera.lookAt(car.position);
 		  
+		}
+		throughStart = 0;
+		throughC1 = 0;
+		throughC2 = 0;
+		function crossFinish(){
+			var originPoint1 = cube.position.clone();
+
+			for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++) {		
+		    var localVertex1 = cube.geometry.vertices[vertexIndex].clone();
+		    var globalVertex1 = localVertex1.applyMatrix4( cube.matrix );
+		    var directionVector1 = globalVertex1.sub( cube.position );
+		    var ray1 = new THREE.Raycaster( originPoint1, directionVector1.clone().normalize() );
+		    var collisionResults1 = ray1.intersectObjects( checkpoint1 );
+		    if ( collisionResults1.length > 0 && collisionResults1[0].distance < directionVector1.length() ) {
+		    	throughC1 = 1;
+			}
+		}
+
+		for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++) {		
+		    var localVertex2 = cube.geometry.vertices[vertexIndex].clone();
+		    var globalVertex2 = localVertex2.applyMatrix4( cube.matrix );
+		    var directionVector2 = globalVertex2.sub( cube.position );
+		    var ray2 = new THREE.Raycaster( originPoint1, directionVector2.clone().normalize() );
+		    var collisionResults2 = ray2.intersectObjects( checkpoint2 );
+		    if ( collisionResults2.length > 0 && collisionResults2[0].distance < directionVector2.length() ) {
+		    	throughC2 = 1;
+			}
+		}
+
+		  for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++) {		
+		    var localVertex3 = cube.geometry.vertices[vertexIndex].clone();
+		    var globalVertex3 = localVertex3.applyMatrix4( cube.matrix );
+		    var directionVector3 = globalVertex3.sub( cube.position );
+		    var ray3 = new THREE.Raycaster( originPoint1, directionVector3.clone().normalize() );
+		    var collisionResults3 = ray3.intersectObjects( finishline );
+		    if ( collisionResults3.length > 0 && collisionResults3[0].distance < directionVector3.length() ) {
+		    	if(throughC1 > 0 && throughC2 > 0){
+		    		alert("You won!")
+		    	}
+			}
+		}
+		console.log(throughC1);
 		}
 		
 		</script>
