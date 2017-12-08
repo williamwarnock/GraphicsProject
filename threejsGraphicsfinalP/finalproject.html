@@ -32,21 +32,24 @@
 			camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 			scene.add(camera);
 			camera.lookAt(scene.position);
+			
 			//Renderer
-            renderer = new THREE.WebGLRenderer();
-            renderer.setSize( window.innerWidth, window.innerHeight );
-            document.body.appendChild( renderer.domElement );
-            //lighting
-            //var light = new THREE.PointLight(0xffffff, 1.5, 2000, 0);
-            var light = new THREE.DirectionalLight(0xffffff, 1.75);
-            light.position.set(-500, 500, -500);
-            //light.position.set(0, 5, 0);
-            scene.add(light);
-            var aLight = new THREE.AmbientLight( 0x404040, 1 );
-            scene.add( aLight );
-            var sphereSize = 1;
-            var pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
-            scene.add( pointLightHelper );
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			
+			//lighting
+			//var light = new THREE.PointLight(0xffffff, 1.5, 2000, 0);
+			var light = new THREE.DirectionalLight(0xffffff, 1.75);
+			light.position.set(-500, 500, -500);
+			//light.position.set(0, 5, 0);
+			scene.add(light);
+			var aLight = new THREE.AmbientLight( 0x404040, 1 );
+			scene.add( aLight );
+			var sphereSize = 1;
+			var pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
+			scene.add( pointLightHelper );
+			
 			// load a texture, set wrap mode to repeat
 			var texture = new THREE.TextureLoader().load( "textures/racetrackEdit.png" );
 			var textureSky = new THREE.TextureLoader().load("textures/cloudy.jpg");
@@ -58,9 +61,10 @@
 			var skyBoxMaterial = new THREE.MeshBasicMaterial({map: textureSky, side: THREE.BackSide});
 			var sky = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
 			scene.add(sky);
+			
 			//Plane Geometry
 			var geometry = new THREE.PlaneGeometry( 5000, 5000, 10, 10);
-            var material = new THREE.MeshPhongMaterial( { map: texture, side: THREE.DoubleSide } );
+			var material = new THREE.MeshPhongMaterial( { map: texture, side: THREE.DoubleSide } );
 			var plane = new THREE.Mesh( geometry, material );
 			plane.position.y = -0.5;
 			plane.rotation.x = Math.PI/2;
@@ -95,7 +99,6 @@
 			  var wallNorth = new THREE.Mesh(wallNorthGeometry, wallNorthMaterial);
 			   wallNorth.position.set(i *100, 7, -5000/2);
 			   	collidableMeshList.push(wallNorth);
-
 			  scene.add(wallNorth);
 			}
 			//North wall
@@ -106,8 +109,18 @@
 			   wallSouth.position.set(i *100, 7, 5000/2);
 			   collidableMeshList.push(wallSouth);
 			  scene.add(wallSouth);
+			
+			
+			//middle wall
+			  var wallGeometry = new THREE.CubeGeometry(1800, 10, 5);
+			  var wallMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
+			  var wall = new THREE.Mesh(wallGeometry, wallSouthMaterial);
+			   wall.position.set(-1600, 7, 80);
+			   wall.rotation.y = Math.PI/2.1;
+			   collidableMeshList.push(wall);
+			  scene.add(wall);
 			}
-
+			
 			//invisible finish line
 			var finishGeometry = new THREE.CubeGeometry(550, 100, 50);
 			var finishmaterial = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
@@ -118,8 +131,8 @@
 			finish.material.opacity = 0;
 			scene.add(finish);
 			finishline.push(finish);
-
-			//invisible checkpoint line
+			
+			//invisible checkpoint1 line
 			var checkpoint1Geometry = new THREE.CubeGeometry(550, 100, 50);
 			var checkpoint1material = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
 			c1 =  new THREE.Mesh(checkpoint1Geometry, checkpoint1material);
@@ -128,8 +141,9 @@
 			c1.material.transparent = true;
 			c1.material.opacity = 0;
 			scene.add(c1);
-			checkpoint1.push(c1)
-
+			checkpoint1.push(c1);
+			
+			//invisible checkpoint2
 			var checkpoint2Geometry = new THREE.CubeGeometry(550, 100, 50);
 			var checkpoint2material = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
 			var c2 =  new THREE.Mesh(checkpoint2Geometry, checkpoint2material);
@@ -139,10 +153,10 @@
 			c2.material.transparent = true;
 			c2.material.opacity = 0;
 			scene.add(c2);
-			checkpoint2.push(c2)
-
+			checkpoint2.push(c2);
+			
 			//car/cube
-             var cubeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
+			 var cubeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, side: THREE.DoubleSide});
 			 var cubeGeometry = new THREE.CubeGeometry(27, 27, 42, 1, 1, 1, cubeMaterial);
 			 cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 			 cube.position.set(0, 7, 0);
@@ -151,39 +165,37 @@
 			 scene.add(cube);
 			 cube.position.x = -2000;
 			 cube.position.z = 100;
-
 			//cones
 			for(i = 0; i < 500; i++) {
 			    // var coneMaterial = new THREE.MeshPhongMaterial({color: 0xff6600, side: THREE.DoubleSide});
-                var coneMaterial = new THREE.MeshPhongMaterial({map: textureCone, side: THREE.DoubleSide});
-				var coneGeometry = new THREE.CylinderGeometry(1, 5, 15, 32);
+			    var coneMaterial = new THREE.MeshPhongMaterial({map: textureCone, side: THREE.DoubleSide});
+			    var coneGeometry = new THREE.CylinderGeometry(1, 5, 15, 32);
 			    var cone = new THREE.Mesh(coneGeometry, coneMaterial);
 			    cone.position.set(Math.floor((Math.random() * 5000) + -2500), 7, Math.floor((Math.random() * 5000) + -2500));
-			   collidableMeshList.push(cone);
-			   scene.add( cone );
+			    collidableMeshList.push(cone);
+			    scene.add( cone );
 			}
-            // car
-            var objectLoader = new THREE.ObjectLoader();
-            objectLoader.load("car2/camero-2010-low-poly.json", function ( obj ) {
-                obj.scale.set(15, 15, 15);
-                car = obj;
-                car.position.x = -2000;
-                car.position.z = 100;
-
-                scene.add( car );
-            } );
+			// car
+			var objectLoader = new THREE.ObjectLoader();
+			objectLoader.load("car2/camero-2010-low-poly.json", function ( obj ) {
+			obj.scale.set(15, 15, 15);
+			car = obj;
+			car.position.x = -2000;
+			car.position.z = 100;
+			scene.add( car );
+			} );
 		}
 		function animate(){
 			requestAnimationFrame(animate);
 			renderer.render(scene, camera);
-            // renderer.shadowMap.enabled = true;
-            // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			// renderer.shadowMap.enabled = true;
+			  // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			if( car != null) {
-			update();
-			 if(pressedUpDown == 1){
-		    car.translateZ(moveDistance);
-		    cube.translateZ(moveDistance);
-		  }
+			  update();
+			  if(pressedUpDown == 1){
+			    car.translateZ(moveDistance);
+			    cube.translateZ(moveDistance);
+			  }
 			}
 			
 		}
@@ -192,7 +204,6 @@
 		var moveDistance = 200 * delta;
 		var throughFinish = 0;
 		var start = 0;
-
 		function update() {
 		  delta = clock.getDelta();
 		  var rotationAngle = Math.PI/2*delta;	
@@ -210,7 +221,6 @@
 		  if(keyboard.pressed("A")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
 		    cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotationAngle);
-
 		  }
 		  if(keyboard.pressed("D")){
 		    car.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotationAngle);
@@ -232,10 +242,8 @@
 		      	car.position.set(-2000, 7, 100);
 			 	cube.position.set(-2000, 7, 100);
 			 	throughFinish = 0;
-
 		        alert ("You lose! Do not hit walls or cones! Restart!");
 		      	location.reload();
-
 			}
 		    }
 		    			crossFinish();
@@ -252,7 +260,6 @@
 		throughC2 = 0;
 		function crossFinish(){
 			var originPoint1 = cube.position.clone();
-
 			for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++) {		
 		    var localVertex1 = cube.geometry.vertices[vertexIndex].clone();
 		    var globalVertex1 = localVertex1.applyMatrix4( cube.matrix );
@@ -263,7 +270,6 @@
 		    	throughC1 = 1;
 			}
 		}
-
 		for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++) {		
 		    var localVertex2 = cube.geometry.vertices[vertexIndex].clone();
 		    var globalVertex2 = localVertex2.applyMatrix4( cube.matrix );
@@ -274,7 +280,6 @@
 		    	throughC2 = 1;
 			}
 		}
-
 		  for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++) {		
 		    var localVertex3 = cube.geometry.vertices[vertexIndex].clone();
 		    var globalVertex3 = localVertex3.applyMatrix4( cube.matrix );
@@ -283,11 +288,12 @@
 		    var collisionResults3 = ray3.intersectObjects( finishline );
 		    if ( collisionResults3.length > 0 && collisionResults3[0].distance < directionVector3.length() ) {
 		    	if(throughC1 > 0 && throughC2 > 0){
-		    		alert("You won!")
+		    		alert("You won!");
+		    		location.reload();
+
 		    	}
 			}
 		}
-		console.log(throughC1);
 		}
 		
 		</script>
