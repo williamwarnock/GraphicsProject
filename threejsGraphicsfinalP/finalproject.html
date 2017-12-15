@@ -8,6 +8,8 @@
 		</style>
 	</head>
 	<body>
+		<div class="stopwatch"></div>
+
 		<script src="js/three.js"></script>
 		<script src="js/keys.js"></script>
 		<script src='js/THREEx.KeyboardState.js'></script>
@@ -21,6 +23,7 @@
 		var checkpoint1 = [];
 		var checkpoint2 = [];
 		var finishline = [];
+		var light;
 		
 		init();
 		animate();
@@ -39,17 +42,14 @@
 			document.body.appendChild( renderer.domElement );
 			
 			//lighting
-			//var light = new THREE.PointLight(0xffffff, 1.5, 2000, 0);
-			var light = new THREE.DirectionalLight(0xffffff, 1.75);
-			light.position.set(-500, 500, -500);
-			//light.position.set(0, 5, 0);
+			light = new THREE.DirectionalLight(0xffffff, 1);
+			light.position.set(-2500, 0, 0);
+			light.target.position.set(0,0,0);
 			scene.add(light);
 			var aLight = new THREE.AmbientLight( 0x404040, 1 );
 			scene.add( aLight );
 			var sphereSize = 1;
-			var pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
-			scene.add( pointLightHelper );
-			
+
 			// load a texture, set wrap mode to repeat
 			var texture = new THREE.TextureLoader().load( "textures/racetrackEdit.png" );
 			var textureSky = new THREE.TextureLoader().load("textures/cloudy.jpg");
@@ -75,7 +75,7 @@
 			  var wallEastGeometry = new THREE.CubeGeometry(100, 100, 5);
 			  var wallEastMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
 			  var wallEast = new THREE.Mesh(wallEastGeometry, wallEastMaterial);
-			   wallEast.position.set(5000/2, 7, i *100);
+			  wallEast.position.set(5000/2, 7, i *100);
 			  wallEast.rotation.y = Math.PI/2;
 			  scene.add(wallEast);
 			  collidableMeshList.push(wallEast);
@@ -86,7 +86,7 @@
 			  var wallWestGeometry = new THREE.CubeGeometry(100, 100, 5);
 			  var wallWestMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
 			  var wallWest = new THREE.Mesh(wallWestGeometry, wallWestMaterial);
-			   wallWest.position.set(-5000/2, 7, i *100);
+			  wallWest.position.set(-5000/2, 7, i *100);
 			  wallWest.rotation.y = Math.PI/2;
 			  collidableMeshList.push(wallWest);
 			  scene.add(wallWest);
@@ -97,8 +97,8 @@
 			  var wallNorthGeometry = new THREE.CubeGeometry(100, 100, 5);
 			  var wallNorthMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
 			  var wallNorth = new THREE.Mesh(wallNorthGeometry, wallNorthMaterial);
-			   wallNorth.position.set(i *100, 7, -5000/2);
-			   	collidableMeshList.push(wallNorth);
+			  wallNorth.position.set(i *100, 7, -5000/2);
+			  collidableMeshList.push(wallNorth);
 			  scene.add(wallNorth);
 			}
 			//North wall
@@ -106,15 +106,15 @@
 			  var wallSouthGeometry = new THREE.CubeGeometry(100, 100, 5);
 			  var wallSouthMaterial = new THREE.MeshPhongMaterial({map: textureWalls, side: THREE.DoubleSide});
 			  var wallSouth = new THREE.Mesh(wallSouthGeometry, wallSouthMaterial);
-			   wallSouth.position.set(i *100, 7, 5000/2);
-			   collidableMeshList.push(wallSouth);
+			  wallSouth.position.set(i *100, 7, 5000/2);
+			  collidableMeshList.push(wallSouth);
 			  scene.add(wallSouth);
 			}
 
 
 			//middle wall along finishline
 			var wall1Geometry = new THREE.CubeGeometry(2150, 20, 150);
-			var wall1Material = new THREE.MeshPhongMaterial({color: 0xE56719, side: THREE.DoubleSide});
+			var wall1Material = new THREE.MeshPhongMaterial({color: 0x000080, side: THREE.DoubleSide});
 			var wall1 = new THREE.Mesh(wall1Geometry, wall1Material);
 			wall1.position.set(-1300, 7, 250);
 			wall1.rotation.y = Math.PI/2;
@@ -342,8 +342,6 @@
 		function animate(){
 			requestAnimationFrame(animate);
 			renderer.render(scene, camera);
-			// renderer.shadowMap.enabled = true;
-			  // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			if( car != null) {
 			  update();
 			  if(pressedUpDown == 1){
@@ -358,9 +356,38 @@
 		var moveDistance = 200 * delta;
 		var throughFinish = 0;
 		var start = 0;
+		var lightPostionY = 0;
+		var lightPostionX = -2600;
+		var x = 0;
+		var night = false;
 		function update() {
-		  delta = clock.getDelta();
-		  var rotationAngle = Math.PI/2*delta;	
+
+			if(lightPostionX <= 0 && !night){
+				lightPostionY+=5;
+				lightPostionX+=5;
+			}else if(lightPostionX > 0 && !night){
+				if(lightPostionX == 2500){
+					night = true;
+				}else{
+					lightPostionY-=5;
+					lightPostionX+=5;
+				}
+			}else if(lightPostionX > 0 && night){
+				lightPostionX-=5;
+				lightPostionY-=5;
+			}else{
+				if(lightPostionX == -2500){
+					night = false;
+				}else{
+				lightPostionY+=5;
+				lightPostionX-=5;
+				}
+			}
+			light.position.x = lightPostionX;
+			light.position.y = lightPostionY;
+
+			delta = clock.getDelta();
+		   var rotationAngle = Math.PI/2*delta;	
 		
 		  if(keyboard.pressed("W")){
 		    pressedUpDown = 1;
@@ -414,6 +441,7 @@
 		throughC2 = 0;
 		function crossFinish(){
 			var originPoint1 = cube.position.clone();
+			
 			for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++) {		
 		    var localVertex1 = cube.geometry.vertices[vertexIndex].clone();
 		    var globalVertex1 = localVertex1.applyMatrix4( cube.matrix );
